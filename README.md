@@ -8,13 +8,17 @@ Surface Detection - Semantics'* (*'GSD-S'*) along with our detection method *'Gl
 
 ## Dataset Summary
 
-![dataset_summary](assets/dataset_summary.pdf)
+![dataset_summary](assets/dataset_summary.png)
 
 Refer to <a href="utils/GSD-S_color_map.csv">GSD-S_color_map.csv</a> for semantic category color mapping.
 
 ## Method Design
 
-![method_design](assets/method_design.pdf)
+![method_design](assets/method_design.png)
+
+## Comparison
+
+![comparison](assets/comparison.png)
 
 ## Installation
 
