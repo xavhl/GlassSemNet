@@ -2,9 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.ResNet import Res_DeepLabV3P
+from model.backbone.ResNet import Res_DeepLabV3P, Res_backbone
 from model.backbone.SegFormer import SegFormer
-from model.backbone.DeepLab import DeepLabHeadV3Plus
 from model.UperNet import UPerNet
 from model.SAA import SAA
 from model.CCA import CCA
@@ -18,8 +17,6 @@ class Sem_Enc(nn.Module):
 	def __init__(self, num_classes):
 		super(Sem_Enc, self).__init__()
 		
-		self.projection = DeepLabHeadV3Plus(num_classes=num_classes)
-
 		self.conv1 = nn.Conv2d(num_classes, num_classes, 7, 1, 4, groups=num_classes, bias=False) 
 		self.pool1 = nn.AvgPool2d(6)
 
@@ -31,10 +28,8 @@ class Sem_Enc(nn.Module):
 		self.bn = nn.BatchNorm2d(num_classes)
 		self.relu = nn.ReLU()
 
-	def forward(self, features):
-		x = self.projection({'low_level': features[0], 'out': features[3]})
-
-		conv = self.conv1(x) 
+	def forward(self, semantic_pred):
+		conv = self.conv1(semantic_pred) 
 		conv = self.pool1(conv)
 		conv = self.bn(conv)
 		conv = self.relu(conv)
@@ -58,7 +53,7 @@ class GlassSemNet(nn.Module):
 		self.num_classes = 43
 
 		self.spatial_backbone = SegFormer()
-		self.semantic_backbone = Res_DeepLabV3P()
+		self.semantic_backbone = Res_DeepLabV3P(self.num_classes)
 		self.sem_enc = Sem_Enc(self.num_classes)
 
 		self.saa0 = SAA(64, 256, self.num_classes)
@@ -79,9 +74,10 @@ class GlassSemNet(nn.Module):
 		resnet_out = self.semantic_backbone(x)
 		semantic_feats = resnet_out['backbone']
 		semantic_lowlevel = resnet_out['layer0']
+		semantic_pred = resnet_out['pred']
 
 		# Semantic encodings
-		sem_enc = self.sem_enc(semantic_feats)
+		sem_enc = self.sem_enc(semantic_pred)
 
 		# SAA Module
 		saa0 = self.saa0(spatial_feats[0], semantic_feats[0], sem_enc)
@@ -99,7 +95,7 @@ class GlassSemNet(nn.Module):
 		decoder_feats = [semantic_lowlevel, l0, l1, l2, l3]
 		out = self.decoder(decoder_feats)#, self.aux1(saa1), self.aux2(cca3)
 
-		return out
+		return {'out': out, 'semantic_pred': semantic_pred}
 		
 # if __name__ == '__main__':
 # 	x = torch.rand(2,3,384,384)

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 
+from model.backbone.DeepLab import DeepLabHeadV3Plus
 import model.backbone.ResNet_def as resnet
 
 class BasicConv(nn.Module): ## debug
@@ -41,20 +42,22 @@ class Res_DeepLabV3P(nn.Module):
 	'''
 	Res backbone for semantic feature extraction
 	'''
-	def __init__(self) -> None:
+	def __init__(self, num_classes) -> None:
 		super(Res_DeepLabV3P, self).__init__()
 		
-		self.resnet = resnet.__dict__['resnet50'](pretrained=True,replace_stride_with_dilation=[False, True, True])
-		self.conv1 = self.resnet.conv1
-		self.bn1 = self.resnet.bn1
-		self.relu = self.resnet.relu
-		self.max_pool = self.resnet.maxpool
-		self.layer1 = self.resnet.layer1
-		self.layer2 = self.resnet.layer2
-		self.layer3 = self.resnet.layer3
-		self.layer4 = self.resnet.layer4
+		self.resnext = resnet.__dict__['resnext50_32x4d'](pretrained=True,replace_stride_with_dilation=[False, True, True])
+		self.conv1 = self.resnext.conv1
+		self.bn1 = self.resnext.bn1
+		self.relu = self.resnext.relu
+		self.max_pool = self.resnext.maxpool
+		self.layer1 = self.resnext.layer1
+		self.layer2 = self.resnext.layer2
+		self.layer3 = self.resnext.layer3
+		self.layer4 = self.resnext.layer4
 
 		self.projection = ResNet_Proj()
+		
+		self.classifier = DeepLabHeadV3Plus(num_classes=num_classes)
 
 	def forward(self, x):
 		
@@ -66,6 +69,7 @@ class Res_DeepLabV3P(nn.Module):
 		x = self.layer3(x) ; features.append(x)
 		x = self.layer4(x) ; features.append(x)#; layer4 = x
 
-		features = self.projection(features)
+		predict = self.classifier({'low_level': features[0], 'out': features[3]})
+		features_ = self.projection(features)
 
-		return {'backbone': features, 'layer0': layer0}
+		return {'layer0': layer0, 'backbone': features_, 'pred': predict}

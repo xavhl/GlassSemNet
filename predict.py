@@ -5,6 +5,8 @@ import numpy as np
 import argparse
 import os
 from tqdm import tqdm
+from joblib import Parallel, delayed
+num_worker = 32
 
 from model.GlassSemNet import GlassSemNet
 from utils.dataloader import get_loader_testbatch
@@ -30,27 +32,42 @@ def save_pred(images_tensor, pred_tensor, original_size, save_path):
 	imo = im.resize(original_size)
 	imo.save(save_path)
 
-def predict(test_loader, model, save_dir, device):
+def save_pred_sem(pred_tensor, original_size, save_path):
+
+	predict_np = (pred_tensor.unsqueeze(0).data.cpu().numpy().squeeze()).astype(np.uint8)
+	
+	im = Image.fromarray(predict_np)
+	imo = im.resize(original_size, resample=Image.NEAREST) # resizing messes up predictions
+	imo.save(save_path)
+	
+def predict(test_loader, model, save_dir, semantic):
 	model.to(device)
 	model.eval()
 
 	for images, names, sizes in tqdm(test_loader):
 		images = images.to(device)
 		with torch.no_grad():
-			preds = model(images)#[0] # pred: [output, aux1, aux2]
-			preds = F.interpolate(preds, size=(images.shape[-2:]), mode='bilinear', align_corners=True)
-			
+			output = model(images)
+			preds = F.interpolate(output['out'], size=(images.shape[-2:]), mode='bilinear', align_corners=True)
+			sem_preds = F.interpolate(output['semantic_pred'], size=(images.shape[-2:]), mode='bilinear', align_corners=True)
+			sem_preds = torch.argmax(sem_preds, 1)
+
 			for j in range(preds.shape[0]):
 				original_size = (sizes[0][j], sizes[1][j])
-				save_pred(images[j], preds[j], original_size, save_dir+names[j])
+				save_pred(images[j], preds[j], original_size, os.path.join(save_dir, 'output', names[j] ))
+				if semantic:
+					save_pred_sem(sem_preds[j], original_size, os.path.join(save_dir, 'semantic', names[j]))
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu"); print('device:', device)
 
 def main(args):	
 	if not os.path.exists(args.output):
 		os.makedirs(args.output)
 
-	ckpt_path = args.checkpoints # '/raid/home/yhyeung2/fyp/codes/lambdalabs_codes/trained_models/GlassSem_UpTo2_20220815_glass_seg/GlassSemNet.pth'
+	ckpt_path = args.checkpoints # /home/yhyeung2/fyp/codes/lambdalabs_codes/trained_models/GlassSem_UpTo2_20220815_glass_seg/GlassSemNetv2.pth
 	image_root = args.input # '/raid/home/yhyeung2/fyp/datasets/whole_sesegs/test/images/'
-	save_dir = args.output # '/raid/home/yhyeung2/fyp/codes/lambdalabs_codes/test_maps/GlassSem_UpTo2_20220815_glass_seg/whole_sesegs/epoch128_modelparams_test/output/'
+	save_dir = args.output # '/raid/home/yhyeung2/fyp/codes/lambdalabs_codes/test_maps/GlassSem_UpTo2_20220815_glass_seg/whole_sesegs/epoch128_modelparams_test/output/''
+	semantic = args.semantic
 	batchsize = args.batchsize
 
 	test_loader = get_loader_testbatch(image_root, batchsize, trainsize=384)
@@ -60,8 +77,7 @@ def main(args):
 	model.load_state_dict(ckpt_dict)
 	print('loaded model:',ckpt_path)
 
-	device = torch.device("cuda" if torch.cuda.is_available() else "cpu"); print('device:', device)
-	predict(test_loader, model, save_dir, device)
+	predict(test_loader, model, save_dir, semantic)
 
 if __name__ == '__main__':
 
@@ -69,7 +85,8 @@ if __name__ == '__main__':
 	parser.add_argument("-c", "--checkpoints", type=str, required=True)
 	parser.add_argument("-i", "--input", type=str, required=True)
 	parser.add_argument("-o", "--output", type=str, required=True)
-	parser.add_argument("-batch", "--batchsize", action="store_false", default=32)
+	parser.add_argument("-s", "--semantic", action='store_true')
+	parser.add_argument("-b", "--batchsize", type=int, default=32)
 	args = parser.parse_args()
 
 	main(args)

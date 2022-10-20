@@ -10,7 +10,7 @@ from torch.hub import load_state_dict_from_url
 
 
 model_urls = {
-	'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
+	'resnext50_32x4d': 'https://download.pytorch.org/models/resnext50_32x4d-7cdf4587.pth',
 }
 
 
@@ -212,13 +212,15 @@ def _resnet(arch, block, layers, pretrained, progress, **kwargs):
 	return model
 
 
-def resnet50(pretrained=False, progress=True, **kwargs):
-	r"""ResNet-50 model from
-	`"Deep Residual Learning for Image Recognition" <https://arxiv.org/pdf/1512.03385.pdf>`_
+def resnext50_32x4d(pretrained=False, progress=True, **kwargs):
+	r"""ResNeXt-50 32x4d model from
+	`"Aggregated Residual Transformation for Deep Neural Networks" <https://arxiv.org/pdf/1611.05431.pdf>`_
 
 	Args:
 		pretrained (bool): If True, returns a model pre-trained on ImageNet
 		progress (bool): If True, displays a progress bar of the download to stderr
 	"""
-	return _resnet('resnet50', Bottleneck, [3, 4, 6, 3], pretrained, progress,
-				   **kwargs)
+	kwargs['groups'] = 32
+	kwargs['width_per_group'] = 4
+	return _resnet('resnext50_32x4d', Bottleneck, [3, 4, 6, 3],
+				   pretrained, progress, **kwargs)
