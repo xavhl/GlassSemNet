@@ -3,42 +3,33 @@
 <!-- > [<a href="_readme_doc/CVPR1159_Mirror_detection_supplementary_material_2022.pdf">Project Page</a>]  -->
 > [<a href="https://jiaying.link/neurips2022-gsds/">Project Page</a>] [<a href="">Paper</a>] [<a href="assets/poster.pdf">Poster</a>] 
 
-This repository is for the newly proposed dataset *'Glass
-Surface Detection - Semantics'* (*'GSD-S'*) along with our detection method *'Glass Semantic Network'* (*‘GlassSemNet’*).
+This is an update on GlassSemNet from which the model is now able to produce semantic segmentation predictions for visualization purpose.
 
-## Dataset Summary
+## Visualization
 
-![dataset_summary](assets/dataset_summary.png)
+Segmentations produced by the semantic backbone illustrated that the model was able to recognize object semantics. Features (layers 2 and 4) from intermediate layers were extracted and fed to auxiliary classifiers. 
 
-Refer to <a href="utils/GSD-S_color_map.csv">utils/GSD-S_color_map.csv</a> for semantic category color mapping.
-
-## Method Design
-
-![method_design](assets/method_design.png)
+![visualization](assets/visualization.png)
 
 ## Comparison
 
 ![comparison](assets/comparison.png)
 
-## Installation
-
-Library dependencies require python 3.8+ environment and are summarized in <a href="requirements.txt">requirements.txt</a>.
-
-```bash
-> pip install -r requirements.txt
-```
+Some minor improvements were obtained after changing the semantic backbone from ResNet50 to ResNext50_32x4d.
 
 ## Demo
 
-Inference and visualization scripts with respective required input directories. <a href="https://drive.google.com/file/d/1j2yCn434whBFcZLOTxeH0iSGx2uMtV2F/view?usp=sharing">Trained model weights</a> available for inference and testing.
+Inference and visualization scripts with respective required input directories. <a href="https://drive.google.com/file/d/1VpN9sojp8nBETVdaPHyyOssJsXrOshV3/view?usp=sharing">Trained model weights (v2)</a> available for inference and testing. 
 
 ```bash
-> python predict.py -c CHECKPOINT -i IMAGE -o OUTPUT
+# To view the segmentation results, pass the 'SEMANTIC' flag argument into the scripts
 
-> python visualize.py -i IMAGE -p PREDICTION -o OUTPUT
+> python predict.py -c CHECKPOINT -i IMAGE -o OUTPUT [-s SEMANTIC]
+
+> python visualize.py -i IMAGE -p PREDICTION -o OUTPUT [-s SEMANTIC] 
 ```
 
-Evaluation script for performance assessment. <a href="https://drive.google.com/file/d/1QyFeH6Md2EYgeb2mAXj4ujUSzSH31O5V/view?usp=sharing">Results by GlassSemNet</a> available for reference.
+Evaluation script for performance assessment. <a href="https://drive.google.com/file/d/1KmbCN1-CDN3ITsrgEXyZ0RHd509uiqlR/view?usp=sharing">Results by GlassSemNetv2</a> available for reference.
 
 ```bash
 > python evaluation.py -p PREDICTION -gt GROUNDTRUTH
