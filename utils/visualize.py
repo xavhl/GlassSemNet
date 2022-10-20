@@ -18,8 +18,7 @@ def color_mask(mask, color, alpha_mask):
 	mask[alpha_mask] = color
 	mask[~alpha_mask] = (0, 0, 0, 0)
 	return mask
-    
-
+	
 def visualize(img_dir, pred_dir, out_dir):
 	alpha_blend = 0.6 
 	threshold = 0.5
@@ -27,7 +26,11 @@ def visualize(img_dir, pred_dir, out_dir):
 	if not os.path.exists(out_dir):
 		os.mkdir(out_dir)
 
-	for img_name in tqdm(sorted(os.listdir(img_dir))):
+	img_list = [x for x in os.listdir(img_dir) if x.endswith('.jpg')]
+
+	def func(idx):
+		img_name = img_list[idx]
+
 		mask_name = os.path.splitext(img_name)[0] + '.png'
 		img_path = os.path.join(img_dir, img_name)
 		mask_path = os.path.join(pred_dir, mask_name)
@@ -49,6 +52,10 @@ def visualize(img_dir, pred_dir, out_dir):
 		
 		merged.save(out_path)
 
+	with Parallel(n_jobs=num_worker) as parallel:
+		parallel(delayed(func)(i) for i in tqdm(range(len(img_list))))
+
+
 def visualize_sem(pred_dir, out_dir):
 	if not os.path.exists(out_dir):
 		os.mkdir(out_dir)
@@ -56,14 +63,17 @@ def visualize_sem(pred_dir, out_dir):
 	color_map = pd.read_csv('utils/GSD-S_color_map.csv')
 	color_map_rgb = np.array([np.array(ast.literal_eval(c)) for c in color_map['rgb'].tolist()])
 
-	# print(f'sorted(os.listdir(pred_dir)) {len(sorted(os.listdir(pred_dir)))} {sorted(os.listdir(pred_dir))[0]}')
+	pred_img_list = [x for x in os.listdir(pred_dir) if x.endswith('.png')]
 
-	for img_name in tqdm(sorted(os.listdir(pred_dir))):
+	def func(idx):
+		img_name = pred_img_list[idx]
 		seseg = Image.open(os.path.join(pred_dir, img_name))
-		# print(seseg.shape, np.unique(seseg), seseg);input('...')
 		seseg_color = (color_map_rgb[np.array(seseg)]).astype(np.uint8)
 		seseg_color = Image.fromarray(seseg_color, 'RGB')
 		seseg_color.save(os.path.join(out_dir, img_name))
+
+	with Parallel(n_jobs=num_worker) as parallel:
+		parallel(delayed(func)(i) for i in tqdm(range(len(pred_img_list))))
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
