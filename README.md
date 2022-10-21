@@ -13,7 +13,7 @@ Segmentations produced by the semantic backbone illustrated that the model was a
 
 ## Comparison
 
-![comparison](assets/comparison.png)
+![comparison_quantitative](assets/comparison_quantitative.png)
 
 Some minor improvements were obtained after changing the semantic backbone from ResNet50 to ResNext50_32x4d.
 
