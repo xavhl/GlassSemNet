@@ -6,6 +6,8 @@
 This repository is for the newly proposed dataset *'Glass
 Surface Detection - Semantics'* (*'GSD-S'*) along with our detection method *'Glass Semantic Network'* (*‘GlassSemNet’*).
 
+*<a href="https://github.com/xavhl/GlassSemNet/tree/v2">GlassSemNetV2</a> is now available
+
 ## Dataset Summary
 
 ![dataset_summary](assets/dataset_summary.png)
