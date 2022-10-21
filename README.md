@@ -1,7 +1,7 @@
 # 'Exploiting Semantic Relations for Glass Surface Detection' (NeurIPS 2022)
 
 <!-- > [<a href="_readme_doc/CVPR1159_Mirror_detection_supplementary_material_2022.pdf">Project Page</a>]  -->
-> [<a href="https://jiaying.link/neurips2022-gsds/">Project Page</a>] [<a href="https://openreview.net/forum?id=kBNhgqXatI">Paper</a>] [<a href="assets/poster.pdf">Poster</a>] 
+> [<a href="https://jiaying.link/neurips2022-gsds/">Project Page</a>] [<a href="https://openreview.net/forum?id=WrIrYMCZgbb">Paper</a>] [<a href="assets/poster.pdf">Poster</a>] 
 
 This repository is for the newly proposed dataset *'Glass
 Surface Detection - Semantics'* (*'GSD-S'*) along with our detection method *'Glass Semantic Network'* (*‘GlassSemNet’*).
