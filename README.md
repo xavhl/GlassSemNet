@@ -1,7 +1,7 @@
 # 'Exploiting Semantic Relations for Glass Surface Detection' (NeurIPS 2022)
 
 <!-- > [<a href="_readme_doc/CVPR1159_Mirror_detection_supplementary_material_2022.pdf">Project Page</a>]  -->
-> [<a href="https://jiaying.link/neurips2022-gsds/">Project Page</a>] [<a href="">Paper</a>] [<a href="assets/poster.pdf">Poster</a>] 
+> [<a href="https://jiaying.link/neurips2022-gsds/">Project Page</a>] [<a href="https://openreview.net/forum?id=WrIrYMCZgbb">Paper</a>] [<a href="assets/poster.pdf">Poster</a>] 
 
 This is an update on GlassSemNet from which the model is now able to produce semantic segmentation predictions for visualization purpose.
 
