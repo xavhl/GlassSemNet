@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.backbone.ResNet import Res_DeepLabV3P, Res_backbone
+from model.backbone.ResNet import Res_DeepLabV3P #, Res_backbone
 from model.backbone.SegFormer import SegFormer
 from model.UperNet import UPerNet
 from model.SAA import SAA
