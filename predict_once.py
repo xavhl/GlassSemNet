@@ -73,20 +73,7 @@ def run(image_root:str, save_dir:str, semantic:bool, batchsize:int=32):
 	global test_loader, model
 	if not os.path.exists(save_dir):
 		os.makedirs(save_dir)
-	'''
-	ckpt_path = args.checkpoints # /home/yhyeung2/fyp/codes/lambdalabs_codes/trained_models/GlassSem_UpTo2_20220815_glass_seg/GlassSemNetv2.pth
-	image_root = args.input # '/raid/home/yhyeung2/fyp/datasets/whole_sesegs/test/images/'
-	save_dir = args.output # '/raid/home/yhyeung2/fyp/codes/lambdalabs_codes/test_maps/GlassSem_UpTo2_20220815_glass_seg/whole_sesegs/epoch128_modelparams_test/output/''
-	semantic = args.semantic
-	batchsize = args.batchsize
-
-	test_loader = get_loader_testbatch(image_root, batchsize, trainsize=384)
-
-	model = GlassSemNet()
-	ckpt_dict = torch.load(ckpt_path)
-	model.load_state_dict(ckpt_dict)
-	print('loaded model:',ckpt_path)
-	'''
+		
 	test_loader = get_loader_testbatch(image_root, batchsize, trainsize=384)
 
 	predict(test_loader, model, save_dir, semantic)
