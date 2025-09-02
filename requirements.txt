@@ -1,0 +1,11 @@
+einops
+joblib
+numpy
+opencv-python
+pandas
+pydensecrf @ git+https://github.com/xbais/pydensecrf.git
+timm
+torch
+torchvision
+tqdm
+Pillow
