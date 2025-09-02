@@ -7,7 +7,7 @@ class TestDataset_Batch(data.Dataset):
     def __init__(self, image_root, trainsize):
         self.trainsize = trainsize
         image_root_dir_list = sorted(os.listdir(image_root))
-        self.images = [image_root + f for f in image_root_dir_list if f.endswith('.jpg')]
+        self.images = [os.path.join(image_root, f) for f in image_root_dir_list if f.endswith('.jpg')]
         self.size = len(self.images)
 
         self.img_transform = transforms.Compose([
